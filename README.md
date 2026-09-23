@@ -1,10 +1,10 @@
 # CRM Conversational AI Agent
 
 A conversational AI agent that lets you search a CRM system in plain English
-instead of clicking through menus and filters. Originally built as a
-personal hackathon project exploring how far natural language could replace
-manual CRM navigation, then rebuilt here as a clean, standalone,
-credential-free demo.
+instead of clicking through menus and filters — and export whatever it finds
+straight to Excel, Word, or PDF. Originally built as a personal hackathon
+project exploring how far natural language could replace manual CRM
+navigation, then rebuilt here as a clean, standalone, credential-free demo.
 
 ## Why this exists
 
@@ -54,6 +54,9 @@ Germany" and get an answer back immediately, in natural language.
    answer. Simple lookups use Haiku; larger or more ambiguous result sets
    use Sonnet, since that needs more reasoning to summarize well. This is
    the same dual-model, cost-conscious pattern used across this portfolio.
+4. **Export** — every result set is also shown as a table in the UI, with
+   one-click export to Excel, Word, or PDF (`agent/export.py`), so a result
+   can be shared as a report rather than only read in the chat window.
 
 ## Running it
 
@@ -95,4 +98,6 @@ cost-conscious testing approach used elsewhere in this portfolio).
 ## Tech stack
 
 Python, Streamlit, `anthropic` SDK (Claude Haiku + Sonnet, dual-model),
-`requests` for OData calls, `python-dotenv` for local config, `pytest`.
+`requests` for OData calls, `python-dotenv` for local config, `pandas` +
+`openpyxl` (Excel export), `python-docx` (Word export), `reportlab` (PDF
+export), `pytest`.

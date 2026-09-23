@@ -10,10 +10,12 @@ enter a tenant URL, username, and password in the sidebar (session-only,
 never written to disk).
 """
 import os
+from dataclasses import dataclass, field
 
 import streamlit as st
 from dotenv import load_dotenv
 
+from agent.export import to_excel_bytes, to_pdf_bytes, to_word_bytes
 from agent.middleware import format_response, parse_intent
 from crm.client import CrmClient, CrmCredentials
 
@@ -56,14 +58,37 @@ def _render_sidebar() -> None:
                 st.session_state["pending_prompt"] = prompt
 
 
-def _handle_message(user_message: str) -> str:
+@dataclass
+class AgentReply:
+    answer: str
+    records: list[dict] = field(default_factory=list)
+
+
+def _handle_message(user_message: str) -> AgentReply:
     intent = parse_intent(user_message)
     if intent.needs_clarification or not intent.entity:
-        return intent.clarifying_question or "Could you clarify which records you're looking for?"
+        question = intent.clarifying_question or "Could you clarify which records you're looking for?"
+        return AgentReply(answer=question)
 
     client = _get_client()
     records = client.search(intent.entity, intent.filters)
-    return format_response(user_message, records)
+    answer = format_response(user_message, records)
+    return AgentReply(answer=answer, records=records)
+
+
+def _render_export_buttons(records: list[dict]) -> None:
+    if not records:
+        return
+    st.dataframe(records, use_container_width=True)
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.download_button("Download Excel", to_excel_bytes(records), "crm_results.xlsx",
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    with col2:
+        st.download_button("Download Word", to_word_bytes(records), "crm_results.docx",
+                            "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+    with col3:
+        st.download_button("Download PDF", to_pdf_bytes(records), "crm_results.pdf", "application/pdf")
 
 
 def main() -> None:
@@ -89,9 +114,10 @@ def main() -> None:
 
         with st.chat_message("assistant"):
             with st.spinner("Searching..."):
-                answer = _handle_message(user_message)
-            st.markdown(answer)
-        st.session_state["messages"].append({"role": "assistant", "content": answer})
+                reply = _handle_message(user_message)
+            st.markdown(reply.answer)
+            _render_export_buttons(reply.records)
+        st.session_state["messages"].append({"role": "assistant", "content": reply.answer})
 
 
 if __name__ == "__main__":
