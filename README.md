@@ -1,10 +1,23 @@
 # CRM Conversational AI Agent
 
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
+![Streamlit](https://img.shields.io/badge/UI-Streamlit-FF4B4B)
+![Claude](https://img.shields.io/badge/LLM-Claude%20Haiku%20%2B%20Sonnet-8A63D2)
+![License](https://img.shields.io/badge/License-MIT-green)
+
 A conversational AI agent that lets you search a CRM system in plain English
 instead of clicking through menus and filters — and export whatever it finds
 straight to Excel, Word, or PDF. Originally built as a personal hackathon
 project exploring how far natural language could replace manual CRM
 navigation, then rebuilt here as a clean, standalone, credential-free demo.
+
+**Highlights**
+- 💬 Natural-language search over CRM records — no filters or menus
+- 🤔 Asks a clarifying question instead of guessing on ambiguous queries
+- 🔀 Dual-model routing (Claude Haiku for speed, Sonnet for harder cases) — cost-conscious by design
+- 📤 One-click export of any result set to Excel, Word, or PDF
+- 🧪 Runs out of the box in sandbox mode — zero credentials, zero setup, synthetic data only
+- 🔌 Drop-in support for a real CRM OData tenant, credentials entered at runtime only
 
 ## Why this exists
 
@@ -101,3 +114,22 @@ Python, Streamlit, `anthropic` SDK (Claude Haiku + Sonnet, dual-model),
 `requests` for OData calls, `python-dotenv` for local config, `pandas` +
 `openpyxl` (Excel export), `python-docx` (Word export), `reportlab` (PDF
 export), `pytest`.
+
+## Project structure
+
+```
+crm-conversational-ai-agent/
+├── streamlit_app.py       # Chat UI, sidebar connection form, export buttons
+├── agent/
+│   ├── middleware.py      # Intent parsing + response formatting (Claude Haiku/Sonnet)
+│   └── export.py          # Excel / Word / PDF export
+├── crm/
+│   ├── client.py          # Sandbox + live OData search, one interface for both
+│   └── mock_data.py        # Fully synthetic demo dataset
+├── tests/                  # Deterministic tests, no API key required
+└── requirements.txt
+```
+
+## License
+
+MIT — see [LICENSE](LICENSE).
