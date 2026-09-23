@@ -1,0 +1,4 @@
+streamlit>=1.38
+anthropic>=0.124.0
+requests>=2.32
+python-dotenv>=1.0
